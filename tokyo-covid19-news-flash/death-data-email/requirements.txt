@@ -1,0 +1,9 @@
+# Function dependencies, for example:
+# package>=version
+
+pandas
+lxml
+html5lib
+requests
+bs4
+

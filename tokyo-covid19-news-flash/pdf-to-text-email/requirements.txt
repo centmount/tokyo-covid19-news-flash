@@ -1,0 +1,7 @@
+# Function dependencies, for example:
+# package>=version
+
+pdfminer.six
+requests
+bs4
+tabula-py
