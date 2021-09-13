@@ -65,10 +65,11 @@ add_num = 0
 url2 = f'https://www.fukushihoken.metro.tokyo.lg.jp/hodo/saishin/corona{max_num + add_num}.files/{max_num + add_num}.pdf'
 
 response2 = requests.get(url2)
-code = response2.status_code
-content_length = int(response2.headers['Content-Length'])
+code = response2.status_code  # HTTPステータスコード
+content_length = int(response2.headers['Content-Length'])  # データサイズ
 
-# 新しいページが見つかるまで繰り返す
+# 新しいページが見つかるまで繰り返す（同時にリリースが数件発表されたことがあり、最後の●●●●報⁺4まで探索）
+# HTTPステータスコードとデータサイズ(PDF)80万超で判断
 def repeat_get_page():
     global response2
     global code
