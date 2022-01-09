@@ -6,7 +6,7 @@
 更新されるまでは10秒ごとに取得を繰り返して、取得できるまで「ページが見つかりません」を表示し続け、
 更新データを取得した時点で、データへのリンクをメールで送信します。
 更新直後の速報ニュース配信に活用できます。
-出典：東京都福祉局HP
+出典: 東京都福祉局HP
 https://www.fukushihoken.metro.tokyo.lg.jp/
 """
 
@@ -57,7 +57,7 @@ for i in range(len(elms)):
 max_num = max(elms_list)
 
 # 新しいリリースのページがあるかどうか確認
-add_num = 0
+add_num = 1
 url2 = f'https://www.fukushihoken.metro.tokyo.lg.jp/hodo/saishin/corona{max_num + add_num}.files/{max_num + add_num}.pdf'
 
 response2 = requests.get(url2)
@@ -66,13 +66,13 @@ content_length = int(response2.headers['Content-Length'])  # データサイズ
 
 
 # 新しいページが見つかるまで繰り返す（同時にリリースが数件発表されたことがあり、最後の●●●●報⁺4まで探索）
-# HTTPステータスコードとデータサイズ(PDF)75万超で判断
+# HTTPステータスコードとデータサイズ(PDF)100万超で判断
 def repeat_get_page():
     global response2
     global code
     global add_num
     global content_length         
-    while code == 404 or content_length <= 750000:
+    while code == 404 or content_length <= 1000000:
         url2 = f'https://www.fukushihoken.metro.tokyo.lg.jp/hodo/saishin/corona{max_num + add_num}.files/{max_num + add_num}.pdf'
         print(url2)
         response2 = requests.get(url2)
@@ -80,11 +80,11 @@ def repeat_get_page():
         content_length = int(response2.headers['Content-Length'])
         if code == 404:
             print('ページが見つかりません')
-        if add_num <= 4:
-            add_num += 1
-        else:
-            add_num = 1
-        time.sleep(10)
+            if add_num <= 4:
+                add_num += 1
+            else:
+                add_num = 1
+            time.sleep(10)
     return add_num
 
 
@@ -92,16 +92,15 @@ def repeat_get_page():
 def make_urls():
     global url_positive
     global url_death
-    url_positive = f'https://www.fukushihoken.metro.tokyo.lg.jp/hodo/saishin/corona{max_num + add_num -1}.files/{max_num + add_num -1}.pdf'
-    url_death = f'https://www.fukushihoken.metro.tokyo.lg.jp/hodo/saishin/corona{max_num + add_num}.html'
-    return url_positive, url_death
+    url_positive = f'https://www.fukushihoken.metro.tokyo.lg.jp/hodo/saishin/corona{max_num + add_num}.files/{max_num + add_num}.pdf'
+    return url_positive
 
 
 # メールを送信する
 def sendGmailAttach():
     to = my_address  # 送信先メールアドレス
     sub = '東京都の新型コロナデータ更新' #メール件名
-    text = '東京都の新型コロナデータが更新されました。 \n\n 東京都ＨＰを確認してください。'  # メール本文
+    text = '東京都の新型コロナデータが更新されました。 \n\n 東京都HPを確認してください。'  # メール本文
     html = """
     <html>
       <head></head>
@@ -110,15 +109,12 @@ def sendGmailAttach():
         <p>感染者データ<br>
           <a href= {url_positive}>感染者データへリンク</a>
         </p>
-        <p>死亡データ<br>
-          <a href= {url_death}>死亡データへリンク</a>
-        </p>
-        <p>※東京都ＨＰ更新時に自動送信しています<br>
+        <p>※東京都HP更新時に自動送信しています<br>
           <a href= "https://www.fukushihoken.metro.tokyo.lg.jp/">東京都福祉保健局HP</a>
         </p>
       </body>
     </html>
-    """.format(url_positive=url_positive, url_death=url_death)
+    """.format(url_positive = url_positive)
 
     host, port = 'smtp.gmail.com', 587
 
