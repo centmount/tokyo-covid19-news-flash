@@ -78,7 +78,7 @@ def repeat_get_page():
         response2 = requests.get(url2)
         code = response2.status_code
         content_length = int(response2.headers['Content-Length'])
-        if code == 404:
+        if code == 404 or content_length <= 1000000:
             print('ページが見つかりません')
             if add_num <= 4:
                 add_num += 1
